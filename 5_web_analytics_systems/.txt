@@ -1,0 +1,37 @@
+Даны 2 таблицы:
+Таблица клиентов clients, в которой находятся данные по карточному лимиту каждого клиента
+
+DROP TABLE IF EXISTS clients;
+CREATE TABLE clients (
+id_client INT PRIMARY KEY NOT NULL,
+limit_sum INT
+);
+
+DROP TABLE IF EXISTS transactions;
+CREATE TABLE transactions (
+id_transaction INT PRIMARY KEY NOT NULL,
+id_client INT NOT NULL,
+CONSTRAINT fk_id_client
+	FOREIGN KEY (id_client) REFERENCES clients (id_client)
+	ON DELETE CASCADE
+	ON UPDATE RESTRICT,
+transaction_date DATE,
+transaction_time TIME,
+transaction_sum INT
+);
+
+Написать текст SQL-запроса, выводящего количество транзакций, сумму транзакций, среднюю сумму транзакции и дату и время первой транзакции для каждого клиента
+Найти id пользователей, кот использовали более 70% карточного лимита
+
+
+GA (в DEMO аккаунте Google) :
+1. Топ 3 источник/канал , приносящих трафик на сайт в 2020
+
+2. Топ 3 источник/канал , приносящих деньги на сайт в 2020
+
+3. День недели с самым большим трафиком на сайте в 2020
+
+4. Источник/канал привлечения трафика с максимальным ростом в сравнении с 2019 годом
+
+
+ 	 	
