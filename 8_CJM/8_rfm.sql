@@ -60,7 +60,7 @@ WITH
 	      					END as 
 	      						`R1`,
 
-	      			  CASE  WHEN `F`.`cnt` BETWEEN @F1 AND @F2 THEN 1 -- 1-2 покупки
+	      			  CASE  WHEN `F`.`cnt` = @F1 THEN 1 -- 1 покупкa
 	            			WHEN  `F`.`cnt` BETWEEN @F2 AND @F3 THEN 2 -- 2-10 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F3 AND @F4 THEN 3 -- 10-20 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F4 AND @F5 THEN 4 -- 20-50 покупок
@@ -123,11 +123,11 @@ WITH
 	    			   FROM `RFM`)
 
 -- consolidated table
-	  SELECT `u`.`G` `group`,
+  SELECT `u`.`G` `group`,
 	  		 `u`.`user_id` `user_id`, 
 	  		 `u`.`RFM` `index`,
-	  		 `t`.`count_by_rfm` `count_by_rfm`,
-	  		 -- `d`.`count_by_group` `count_by_group`,
+	  		 -- `t`.`count_by_rfm` `count_by_rfm`,
+	  		 `t1`.`count_by_group` `count_by_group`,
 	  		 `R`.`days` `days`, 
 	  		 `F`.`cnt` `orders`,
 	  		 `m`.`sum_price` `sum`, 
@@ -137,10 +137,14 @@ WITH
 	  LEFT JOIN `M` `m` ON `u`.`user_id` = `m`.`user_id` 
 	  LEFT JOIN `R` ON `R`.`user_id` = `m`.`user_id`
 	  LEFT JOIN `F` ON `F`.`user_id` = `R`.`user_id`
-	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
-	 				FROM `USERGROUPS` `u`
-	 				GROUP BY `index`) as t 
-	  		ON t.`user_id` = `F`.`user_id`
+	  -- LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
+	 				-- FROM `USERGROUPS` `u`
+	 				-- GROUP BY `index`) as t 
+	  		-- ON `t`.`user_id` = `F`.`user_id`
+	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`G` `group`, COUNT(*) `count_by_group` 
+	  				FROM `USERGROUPS` `u`
+	  				GROUP BY `group`) as `t1`
+	  		ON `F`.`user_id` = `t1`.`user_id`
 
 	  		;
 
@@ -188,7 +192,7 @@ WITH
 	      					END as 
 	      						`R1`,
 
-	      			  CASE  WHEN `F`.`cnt` BETWEEN @F1 AND @F2 THEN 1 -- 1-2 покупки
+	      			  CASE  WHEN `F`.`cnt` = @F1 THEN 1 -- 1 покупкa
 	            			WHEN  `F`.`cnt` BETWEEN @F2 AND @F3 THEN 2 -- 2-10 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F3 AND @F4 THEN 3 -- 10-20 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F4 AND @F5 THEN 4 -- 20-50 покупок
@@ -254,8 +258,8 @@ WITH
 	  SELECT `u`.`G` `group`,
 	  		 `u`.`user_id` `user_id`, 
 	  		 `u`.`RFM` `index`,
-	  		 `t`.`count_by_rfm` `count_by_rfm`,
-	  		 -- `d`.`count_by_group` `count_by_group`,
+	  		 -- `t`.`count_by_rfm` `count_by_rfm`,
+	  		 `t1`.`count_by_group` `count_by_group`,
 	  		 `R`.`days` `days`, 
 	  		 `F`.`cnt` `orders`,
 	  		 `m`.`sum_price` `sum`, 
@@ -265,10 +269,14 @@ WITH
 	  LEFT JOIN `M` `m` ON `u`.`user_id` = `m`.`user_id` 
 	  LEFT JOIN `R` ON `R`.`user_id` = `m`.`user_id`
 	  LEFT JOIN `F` ON `F`.`user_id` = `R`.`user_id`
-	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
-	 				FROM `USERGROUPS` `u`
-	 				GROUP BY `index`) as t 
-	  		ON t.`user_id` = `F`.`user_id`
+	  -- LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
+	 				-- FROM `USERGROUPS` `u`
+	 				-- GROUP BY `index`) as t 
+	  		-- ON `t`.`user_id` = `F`.`user_id`
+	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`G` `group`, COUNT(*) `count_by_group` 
+	  				FROM `USERGROUPS` `u`
+	  				GROUP BY `group`) as `t1`
+	  		ON `F`.`user_id` = `t1`.`user_id`
 
 	  		;
 
@@ -308,14 +316,14 @@ WITH
 	  				  		WHEN `R`.`days` > @R1 THEN 1 -- более чем год назад
 	  				  	    WHEN `R`.`days` BETWEEN @R3 AND @R1 THEN 2 -- последняя покупка 100-365 дней назад
 	  				  	    WHEN `R`.`days` BETWEEN @R4 and @R3 THEN 3 -- 60-100 дней назад
-	  				  	    WHEN  `R`.`days` BETWEEN @R5 AND @R4 THEN 4 -- 30-60 дней назад
+	  				  	    WHEN `R`.`days` BETWEEN @R5 AND @R4 THEN 4 -- 30-60 дней назад
 	  				  		WHEN `R`.`days` < @R5 THEN 5 -- менее чем 30 дней назад
 	      					ELSE 0
 	      					END as 
 	      						`R1`,
 
-	      			  CASE  WHEN `F`.`cnt` BETWEEN @F1 AND @F2 THEN 1 -- 1-2 покупки
-	            			WHEN  `F`.`cnt` BETWEEN @F2 AND @F3 THEN 2 -- 2-10 покупок
+	      			  CASE  WHEN `F`.`cnt` = @F1 THEN 1 -- 1 покупкa
+	            			WHEN `F`.`cnt` BETWEEN @F2 AND @F3 THEN 2 -- 2-10 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F3 AND @F4 THEN 3 -- 10-20 покупок
 	            			WHEN `F`.`cnt` BETWEEN @F4 AND @F5 THEN 4 -- 20-50 покупок
 	      					WHEN `F`.`cnt` > @F5 THEN 5 -- больше 50 покупок
@@ -380,8 +388,8 @@ WITH
 	  SELECT `u`.`G` `group`,
 	  		 `u`.`user_id` `user_id`, 
 	  		 `u`.`RFM` `index`,
-	  		 `t`.`count_by_rfm` `count_by_rfm`,
-	  		 -- `d`.`count_by_group` `count_by_group`,
+	  		 -- `t`.`count_by_rfm` `count_by_rfm`,
+	  		 `t1`.`count_by_group` `count_by_group`,
 	  		 `R`.`days` `days`, 
 	  		 `F`.`cnt` `orders`,
 	  		 `m`.`sum_price` `sum`, 
@@ -391,10 +399,14 @@ WITH
 	  LEFT JOIN `M` `m` ON `u`.`user_id` = `m`.`user_id` 
 	  LEFT JOIN `R` ON `R`.`user_id` = `m`.`user_id`
 	  LEFT JOIN `F` ON `F`.`user_id` = `R`.`user_id`
-	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
-	 				FROM `USERGROUPS` `u`
-	 				GROUP BY `index`) as t 
-	  		ON t.`user_id` = `F`.`user_id`
+	  -- LEFT JOIN (SELECT `u`.`user_id`, `u`.`RFM` `index`, COUNT(*) `count_by_rfm`
+	 				-- FROM `USERGROUPS` `u`
+	 				-- GROUP BY `index`) as t 
+	  		-- ON `t`.`user_id` = `F`.`user_id`
+	  LEFT JOIN (SELECT `u`.`user_id`, `u`.`G` `group`, COUNT(*) `count_by_group` 
+	  				FROM `USERGROUPS` `u`
+	  				GROUP BY `group`) as `t1`
+	  		ON `F`.`user_id` = `t1`.`user_id`
 
 	  		;
 -- count users by RFM
