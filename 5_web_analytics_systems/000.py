@@ -1,9 +1,6 @@
 import os
 import re
 import csv
-import numpy as np
-import pandas as pd
-import seaborn as sns
 import mariadb
 from datetime import datetime
 from dotenv import load_dotenv

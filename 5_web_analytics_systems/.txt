@@ -1,23 +1,23 @@
 Даны 2 таблицы:
 Таблица клиентов clients, в которой находятся данные по карточному лимиту каждого клиента
 
-DROP TABLE IF EXISTS clients;
-CREATE TABLE clients (
-id_client INT PRIMARY KEY NOT NULL,
-limit_sum INT
+DROP TABLE IF EXISTS `clients`;
+CREATE TABLE `clients` (
+	`id_client` INT PRIMARY KEY NOT NULL,
+	`limit_sum` INT
 );
 
-DROP TABLE IF EXISTS transactions;
-CREATE TABLE transactions (
-id_transaction INT PRIMARY KEY NOT NULL,
-id_client INT NOT NULL,
-CONSTRAINT fk_id_client
-	FOREIGN KEY (id_client) REFERENCES clients (id_client)
+DROP TABLE IF EXISTS `transactions`;
+CREATE TABLE `transactions` (
+	`id_transaction` INT PRIMARY KEY NOT NULL,
+	`id_client` INT NOT NULL,
+	CONSTRAINT `fk_id_client`
+	FOREIGN KEY (`id_client`) REFERENCES `clients` (`id_client`)
 	ON DELETE CASCADE
 	ON UPDATE RESTRICT,
-transaction_date DATE,
-transaction_time TIME,
-transaction_sum INT
+	`transaction_date` DATE,
+	`transaction_time` TIME,
+	`transaction_sum` INT
 );
 
 Написать текст SQL-запроса, выводящего количество транзакций, сумму транзакций, среднюю сумму транзакции и дату и время первой транзакции для каждого клиента
